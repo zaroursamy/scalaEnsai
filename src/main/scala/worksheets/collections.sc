@@ -1,88 +1,52 @@
-/* Set */
-val uniqueCol = Set(9, 1, 2, 1, 2, 3, 2, 5)
-
-/* Seq */
-val seq = Seq(1, 2, 3)
-
-
-/* Array */
-val arr = Array(1, 2, 3)
-arr(0)
-
-
-/* List */
-val list = List("a", "b", "c","d","e")
-val list2 = "a" :: "b" :: "c" :: Nil
-list.head
-list.tail
-//Nil.head
-
 
 /* Exo: reverse une liste */
-def reverse[T](list:List[T]): List[T] = list match {
+def reverse[T](list: List[T]): List[T] = list match {
   case Nil => Nil
-  case x::Nil => List(x)
-  case x::xs => reverse(xs) ++ List(x)
+  case x :: Nil => List(x)
+  case x :: xs => reverse(xs) ++ List(x)
 }
 
+val list = ('a' to 'h').map(_.toString).toList
+val seq = 1 to 10
 val reversedString = reverse(list)
 val reversedNil = reverse(Nil)
 val reversedInt = reverse(seq.toList)
 
-// stream
-val stream = Stream(1,2,3)
-val streamOneToHundred: Seq[Int] = Stream.fill(10)(scala.util.Random.nextInt())
-
-// tuples
-val unTuple = ("a", 1, List(1, 2))
-unTuple._3
-
-/* Map */
-val myMap = Map(1 -> "one", 2 -> "two", 3 -> "three")
-myMap.get(1)
-myMap.get(9)
-val myNewMap = myMap + (4 -> "four")
-myNewMap
-val oneToHundred: Seq[Int] = 1 to 100
-
-
-// map
-val seqPlusOne = seq.map(_+1)
-val seqToString = seq.map(s => "numero "+s.toString)
-
-import java.util.UUID
-
 import scala.util.Random
-case class Person(name:String, age:Int, uuid:String = UUID.randomUUID().toString)
-def generateAge(): Int = (Random.nextGaussian()+23).toInt
-def choose[T](xs:Seq[T]): T = xs.apply(Random.nextInt(xs.size))
-def generateName() = choose(Seq("toto","tata","titi"))
-val person:Seq[Person] = oneToHundred.map(_=>Person(generateName(), generateAge()))
 
-/* choisir les personnes qui ont 23 ans et qui ont un prénom masculin*/
-def isMasculin(str:String) = str == "toto"
-val filterdPersonn = person.filter({case Person("toto", 23, _)=> true case _ => false})
+case class Person(name: String, age: Int)
 
+object Person {
 
-// filter
-val seqFiltered = seq.filter(_%2==0)
+  def generateAge(): Int = (Random.nextGaussian() + 23).toInt
 
-// flatten
-val flattenList = List(List(1,2), List(3)).flatten
+  def choose[T](xs: Seq[T]): T = xs.apply(Random.nextInt(xs.size))
 
-/* fizzbuzz */
-/*
-Si l'entier est multiple de 3: afficher fizz
-Si l'entier est multiple de 2: afficher buzz
-Si l'entier est multiple de 2 et 3: afficher fizzBuzz
-Sinon renvoyer l'entier en question
- */
-def fizzBuzz(i: Int) = (i % 2 == 0, i % 3 == 0) match {
-  case (true, false) => "fizz"
-  case (false, true) => "buzz"
-  case (true, true) => "fizzBuzz"
-  case _ => i.toString
+  def generateName() = choose[String](Seq("toto", "tata", "titi", "tutu"))
 
+  def apply: Person = Person(
+    generateName(),
+    generateAge()
+  )
+
+  def generate(n: Int): Seq[Person] = Stream.fill(n)(apply)
 }
 
-oneToHundred.map(i => i->fizzBuzz(i))
+val person: Seq[Person] = Person.generate(100).toList
+
+person.map(_.age).reduce((x, y) => math.min(x, y))
+
+person.reduce((p1, p2) => if (p1.age < p2.age) p1 else p2)
+
+person.map(p => List(p, p.copy(age = p.age / 2))).flatten
+person.flatMap(p => p match {
+  case Person("toto", a) if a > 23 => Some("grand toto")
+  case Person("titi", a) if a < 23 => Some("petit titi")
+  case _ => None
+}
+)
+
+person.groupBy(_.age).map(p => p._1 -> p._2.size)
+
+(1 to 10).foldLeft("0+")((s, i) => s + i.toString+ "+").dropRight(1)
+person.foldLeft(Set.empty[Int])((set, p) => set++Set(p.age))

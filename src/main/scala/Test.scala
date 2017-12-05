@@ -57,7 +57,7 @@ sealed trait Event {
   def endTime: Long
 }
 
-trait Appel extends Event{
+sealed trait Appel extends Event{
   def from:String
   def to:String
   def typeAppel: TypeAppel
@@ -77,8 +77,8 @@ object Event {
 
   case class ProcessResult(sessions: Seq[CallSession], rejects: Seq[Event])
 
-  def process(seq: Seq[Appel]): ProcessResult = {
-    val sortedEvent: Seq[Appel] = seq.sortBy(_.startTime)
+  def process(seq: Seq[Event]): ProcessResult = {
+    val sortedEvent: Seq[Event] = seq.sortBy(_.startTime)
 
     case class LocalState(currentCS: Option[CallSession],
                           prevCS: Seq[CallSession],
@@ -116,14 +116,14 @@ object Test {
     val sortant1 = AppelSortant("Tata", 0, "06", 5)
     val sortant2 = AppelSortant("Tata", 6, "06", 7)
     val sortant3 = AppelSortant("Tata", 20, "06", 24)
-    val sortant4 = AppelSortant("Toto", 90, "07", 5)
+    val sortant4 = AppelSortant("Toto", 2, "07", 5)
 
     val entrant1 = AppelEntrant(8, "06", "Tata", 5)
     val entrant2 = AppelEntrant(0, "07", "Toto", 1)
 
     val seq: Seq[Appel] = Seq(sortant1, sortant2, sortant3, sortant4, entrant1, entrant2)
 
-    val res = seq.groupBy{a =>
+    val res: Map[String, Event.ProcessResult] = seq.groupBy{ a =>
       a.typeAppel match {
         case Entrant => a.to
         case Sortant => a.from
@@ -143,7 +143,6 @@ object Test {
     res.get("Toto").foreach(_.sessions.foreach(println))
     println("rejects toto")
     res.get("Toto").foreach(_.rejects.foreach(println))
-
 
 
   }
