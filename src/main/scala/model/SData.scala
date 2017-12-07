@@ -47,10 +47,10 @@ object MData {
       id,
       rank,
       discipline,
-      yearsPhd.toInt,
-      experience.toInt,
+      yearsPhd.toDouble,
+      experience.toDouble,
       sex,
-      salary.toInt
+      salary.toDouble
     )
   }
 }

@@ -3,7 +3,7 @@
 def reverse[T](list: List[T]): List[T] = list match {
   case Nil => Nil
   case x :: Nil => List(x)
-  case x :: xs => reverse(xs) ++ List(x)
+  case x :: xs => reverse(xs) :+ x
 }
 
 val list = ('a' to 'h').map(_.toString).toList

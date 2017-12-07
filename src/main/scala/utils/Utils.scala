@@ -15,7 +15,7 @@ object Utils {
   }
 
   implicit class StatRDD(rdd:RDD[MData]){
-    def meanSalary[K : ClassTag](f:MData => K, g:MData => Double): RDD[(K, Double)] = rdd
+    def meanByKey[K : ClassTag](f:MData => K, g:MData => Double): RDD[(K, Double)] = rdd
       .groupBy(f)
       .map{t =>
         t._1 -> t._2.toSeq.map(g).mean}
